@@ -3,463 +3,392 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEXUS TITAN OMEGA | TOTAL RECALL V12</title>
+    <meta name="google-site-verification" content="2N1Zh_DNVQ2KbJDJcO0sr9bcn48Jo_T-2rIZKTxCSqk" />
+    <title>NEXUS TITAN OMEGA | TRIDENT ULTRA-SENSITIVE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@800&display=swap');
-        
-        :root { --nexus-blue: #3b82f6; --nexus-neon: #00ffd5; }
-        
-        body { background: #010409; color: white; font-family: 'Inter', sans-serif; height: 100vh; display: flex; flex-direction: column; padding: 10px; gap: 10px; overflow: hidden; }
-        
-        .glass { background: rgba(13, 17, 23, 0.98); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 24px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        
-        .vip-name { background: linear-gradient(90deg, #fff, var(--nexus-blue), var(--nexus-neon), var(--nexus-blue), #fff); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shine 2s linear infinite; font-weight: 900; }
+        body { background: #010409; color: white; font-family: 'Inter', sans-serif; height: 100vh; display: flex; flex-direction: column; padding: 8px; gap: 8px; overflow: hidden; border: 0px solid #3b82f6; transition: border 0.3s ease; }
+        .glass { background: rgba(13, 17, 23, 0.98); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 20px; transition: 0.2s; }
+        .vip-name { background: linear-gradient(90deg, #fff, #3b82f6, #00ffd5, #3b82f6, #fff); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shine 2s linear infinite; font-weight: 900; }
         @keyframes shine { to { background-position: 200% center; } }
-
-        #display { font-family: 'JetBrains Mono'; font-size: clamp(3rem, 15vw, 7rem); color: var(--nexus-blue); font-weight: 900; text-shadow: 0 0 50px rgba(59, 130, 246, 0.4); letter-spacing: -2px; }
-
-        .focus-mode { position: fixed !important; inset: 4% !important; z-index: 10001 !important; background: #0d1117 !important; padding: 30px !important; border: 2px solid var(--nexus-blue); border-radius: 40px; box-shadow: 0 0 200px rgba(0,0,0,1); }
-
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.97); z-index: 10000; display: none; backdrop-filter: blur(15px); }
-        
-        .medal-box { background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 20px; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
-        .medal-box:hover { border-color: var(--nexus-neon); background: rgba(0, 255, 213, 0.1); transform: translateY(-5px); }
-
-        .btn-nexus { position: relative; overflow: hidden; transition: 0.3s; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; }
-        .btn-nexus:active { scale: 0.95; }
-        
-        #loadingBar { height: 4px; width: 0%; background: linear-gradient(90deg, var(--nexus-blue), var(--nexus-neon)); position: fixed; top: 0; left: 0; z-index: 30000; transition: 0.5s; }
-        
-        .warning-glow { box-shadow: 0 0 100px rgba(239, 68, 68, 0.5) inset; animation: alert-pulse 1s infinite; }
-        @keyframes alert-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-
-        .admin-input { background: #010409; border: 1px solid rgba(59, 130, 246, 0.3); padding: 15px; border-radius: 15px; color: white; font-weight: 800; width: 100%; text-align: center; }
+        #display { font-family: 'JetBrains Mono'; font-size: clamp(2rem, 10vw, 5rem); color: #3b82f6; font-weight: 900; }
+        .focus-mode { position: fixed !important; top: 5% !important; left: 5% !important; width: 90% !important; height: 90% !important; z-index: 10001 !important; background: #0d1117 !important; padding: 20px !important; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; display: none; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .medal-box { background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 15px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; cursor: pointer; transition: 0.3s; }
+        .medal-box:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.2); }
+        .leader-row { display: flex; align-items: center; justify-content: space-between; padding: 10px; border-bottom: 1px solid rgba(59, 130, 246, 0.1); font-size: 11px; }
+        #aiStatusTag { position: fixed; top: 10px; right: 10px; font-size: 9px; font-weight: 900; background: rgba(59, 130, 246, 0.2); padding: 4px 8px; border-radius: 5px; color: #3b82f6; display: none; z-index: 50; border: 1px solid rgba(59, 130, 246, 0.5); }
     </style>
 </head>
-<body id="mainBody">
-    <div id="loadingBar"></div>
-    <video id="aiEye" autoplay muted playsinline style="display:none;"></video>
-    <div id="aiStatus" class="fixed bottom-8 left-8 z-[10002] bg-blue-600/10 text-blue-400 p-4 rounded-2xl text-[10px] font-black border border-blue-500/30 hidden uppercase tracking-[0.2em]">SİSTEM GÖZETİMİ AKTİF</div>
+<body>
+
+    <div id="aiStatusTag">SCANNING...</div>
     <div id="uiOverlay" class="overlay" onclick="closeFocus()"></div>
 
-    <div id="sealSelection" class="overlay flex items-center justify-center p-6" style="z-index: 20000;">
-        <div class="glass p-10 w-full max-w-md border-blue-600 border-2 text-center" onclick="event.stopPropagation()">
-            <h3 class="text-blue-500 font-black text-2xl mb-2 uppercase tracking-tighter">Zaman Yolculuğu</h3>
-            <p class="text-slate-400 text-xs mb-8 font-bold uppercase tracking-widest">Süreyi Hangi Güne Mühürleyeceksin?</p>
-            <div class="grid gap-4">
-                <button onclick="executeSeal('DU')" class="py-6 bg-slate-900 border border-blue-500/20 rounded-3xl font-black text-white hover:bg-blue-600 transition-all uppercase tracking-widest">DÜNE EKLE (GECE MESAİSİ)</button>
-                <button onclick="executeSeal('BU')" class="py-6 bg-blue-600 rounded-3xl font-black text-white hover:bg-blue-500 transition-all uppercase tracking-widest shadow-lg shadow-blue-600/30">BUGÜNE EKLE (NORMAL)</button>
-            </div>
-            <button onclick="document.getElementById('sealSelection').style.display='none'" class="mt-8 text-red-500 font-black text-[10px] uppercase tracking-[0.3em] opacity-50 hover:opacity-100">İPTAL ET</button>
+    <div id="saveBox" class="overlay" style="display:none; justify-content:center; align-items:center; z-index:25000;">
+        <div class="glass p-6 w-full max-w-xs border-blue-600 border-2 text-center" onclick="event.stopPropagation()">
+            <h3 class="text-blue-400 font-black mb-4 uppercase text-xs">MÜHÜRLEME GÜNÜ</h3>
+            <button onclick="pSave(true)" id="lDayBtn" class="w-full py-4 bg-slate-800 border border-blue-500 rounded-xl mb-2 font-bold text-[10px] uppercase text-white"></button>
+            <button onclick="pSave(false)" id="tDayBtn" class="w-full py-4 bg-slate-800 border border-blue-500 rounded-xl font-bold text-[10px] uppercase text-white"></button>
+            <button onclick="document.getElementById('saveBox').style.display='none'" class="mt-4 text-red-500 text-[10px] font-black uppercase">IPTAL</button>
         </div>
     </div>
 
-    <div id="adminPanel" class="overlay flex items-center justify-center p-6" style="z-index: 25000;">
-        <div class="glass p-10 w-full max-w-lg border-red-600 border-2 text-center" onclick="event.stopPropagation()">
-            <h2 class="text-red-500 font-black text-3xl mb-6 italic uppercase">MASTER CONTROL</h2>
-            <div class="space-y-4">
-                <input type="text" id="targetUser" placeholder="HEDEF KULLANICI" class="admin-input">
-                <input type="number" id="manualTime" placeholder="SÜRE (DAKİKA)" class="admin-input">
-                <div class="grid grid-cols-2 gap-4">
-                    <button onclick="adminUpdate('set')" class="bg-red-600 py-4 rounded-2xl font-black text-xs uppercase">SÜRE SET ET</button>
-                    <button onclick="adminUpdate('reset')" class="bg-slate-800 py-4 rounded-2xl font-black text-xs uppercase">SIFIRLA</button>
-                </div>
+    <div id="admBox" class="overlay" style="display:none; justify-content:center; align-items:center; z-index:25000;">
+        <div class="glass p-6 w-full max-w-sm border-red-600 border-2 text-center" onclick="event.stopPropagation()">
+            <h3 class="text-red-500 font-black mb-4 uppercase">MASTER CONTROL</h3>
+            <div id="admAuth">
+                <input type="password" id="admPass" placeholder="SIFRE" class="w-full p-3 bg-slate-900 text-white rounded-lg mb-4 text-center font-bold border border-red-900">
+                <button onclick="checkAdm()" class="w-full py-3 bg-red-900 rounded-lg font-black uppercase text-xs text-white">GIRIS</button>
             </div>
-            <button onclick="document.getElementById('adminPanel').style.display='none'" class="mt-8 text-white/30 text-[10px] font-black uppercase tracking-widest">ÇIKIŞ YAP</button>
+            <div id="admContent" style="display:none;">
+                <select id="aUsr" class="w-full p-3 bg-slate-900 text-white rounded-lg mb-2 uppercase font-bold text-xs"></select>
+                <select id="aDay" class="w-full p-3 bg-slate-900 text-white rounded-lg mb-2 font-bold text-xs">
+                    <option value="Pzt">PAZARTESİ</option><option value="Sal">SALI</option><option value="Çar">ÇARŞAMBA</option>
+                    <option value="Per">PERŞEMBE</option><option value="Cum">CUMA</option><option value="Cmt">CUMARTESİ</option><option value="Paz">PAZAR</option>
+                </select>
+                <input type="number" id="aMin" placeholder="DAKİKA" class="w-full p-3 bg-slate-900 text-white rounded-lg mb-4 text-center font-bold border border-slate-700">
+                <button onclick="mEdit()" class="w-full py-3 bg-green-600 rounded-lg font-black uppercase text-[10px] text-white mb-2">GUNCELLE</button>
+                <button onclick="mKick()" class="w-full py-3 bg-red-600 rounded-lg font-black uppercase text-[10px] text-white">OPERATOR SIL</button>
+            </div>
+            <button onclick="document.getElementById('admBox').style.display='none'" class="mt-4 text-white text-[10px] opacity-50 font-black">KAPAT</button>
         </div>
     </div>
 
     <div id="loginModal" class="fixed inset-0 bg-[#010409] z-[20000] flex items-center justify-center p-4">
-        <div class="glass p-12 w-full max-w-sm border-blue-600 border-2 text-center shadow-2xl">
-            <h2 class="text-blue-500 font-black text-4xl mb-10 italic uppercase tracking-tighter">NEXUS OMEGA</h2>
-            <input type="text" id="opInput" placeholder="KOD ADINIZI GİRİN" class="w-full bg-slate-950 border border-blue-500/20 p-6 rounded-3xl mb-6 text-white font-black text-center uppercase outline-none focus:border-blue-400 transition-all">
-            <button id="entryBtn" class="w-full py-6 bg-blue-600 text-white rounded-3xl font-black uppercase tracking-[0.5em] hover:bg-blue-500 shadow-xl shadow-blue-900/40">SİSTEME BAĞLAN</button>
+        <div class="glass p-8 w-full max-w-sm border-blue-600 border-2 text-center">
+            <h2 class="text-blue-500 font-black text-3xl mb-6 italic">NEXUS OMEGA</h2>
+            <input type="text" id="opInput" placeholder="KOD ADI" class="w-full bg-slate-900 border border-blue-500/30 p-4 rounded-xl mb-4 text-white font-black text-center focus:outline-none uppercase">
+            <button id="entryBtn" class="w-full py-4 bg-blue-600 text-white rounded-xl font-black uppercase tracking-widest active:scale-95 transition-all">SISTEME GIR</button>
         </div>
     </div>
 
-    <header class="glass p-6 shrink-0 flex items-center justify-between">
-        <div class="flex items-center gap-5">
-            <div id="pAvatar" class="w-16 h-16 rounded-full border-2 border-blue-600 bg-slate-900 overflow-hidden shadow-lg shadow-blue-500/30"></div>
+    <div id="nexusModal" class="fixed inset-0 bg-black/98 z-[15000] hidden items-center justify-center p-4">
+        <div class="bg-[#0d1117] border-2 border-blue-600 p-6 rounded-[30px] w-full max-w-2xl text-center relative max-h-[95vh] flex flex-col overflow-hidden">
+            <div id="medalGrid" class="grid grid-cols-4 sm:grid-cols-5 gap-3 hidden overflow-y-auto no-scrollbar mb-4 p-2"></div>
+            <div id="standardView" class="flex-1 flex flex-col overflow-hidden">
+                <div id="mIcon" class="text-6xl mb-2">📜</div>
+                <h2 id="mTitle" class="text-blue-400 font-black text-xl mb-1 uppercase tracking-tighter">BILGI</h2>
+                <div id="profileIntel" class="hidden flex-1 flex flex-col min-h-0">
+                    <p id="mDesc" class="text-slate-300 text-sm italic mb-4"></p>
+                    <div class="flex-1 bg-slate-900/50 rounded-2xl p-2 min-h-[200px]">
+                        <canvas id="profileChart"></canvas>
+                    </div>
+                </div>
+                <p id="quoteText" class="text-slate-200 text-base italic leading-relaxed font-medium px-4 overflow-y-auto no-scrollbar"></p>
+            </div>
+            <button onclick="closeModal()" class="w-full py-4 bg-blue-600 rounded-2xl font-black text-[11px] uppercase mt-4 active:scale-95">KAPAT</button>
+        </div>
+    </div>
+
+    <header class="glass p-4 shrink-0 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div id="pAvatar" class="w-12 h-12 rounded-full border-2 border-blue-600 bg-slate-900 overflow-hidden"></div>
             <div>
-                <h1 id="userName" class="vip-name text-lg uppercase tracking-widest">OPERATÖR...</h1>
-                <div class="flex gap-6 mt-2">
-                    <span onclick="openQuote()" class="text-[11px] text-blue-400 font-black cursor-pointer uppercase underline decoration-2">📜 DOKTRİNLER</span>
-                    <span onclick="openMedals()" class="text-[11px] text-amber-500 font-black cursor-pointer uppercase underline decoration-2">🎖️ MADALYALAR</span>
+                <div class="flex items-center gap-3">
+                    <h1 id="userName" class="vip-name text-sm uppercase">OPERATÖR</h1>
+                    <button onclick="openQuote()" class="bg-red-600 px-3 py-1 rounded-lg text-[9px] font-black text-white uppercase">DISIPLIN</button>
+                </div>
+                <div class="flex gap-4 mt-1">
+                    <span onclick="openQuote()" class="text-[10px] text-blue-400 font-bold cursor-pointer underline uppercase">📜 DOKTRIN</span>
+                    <span onclick="openMedals()" class="text-[10px] text-amber-500 font-bold cursor-pointer underline uppercase">🎖️ MADALYA</span>
                 </div>
             </div>
-        </div>
-        <div class="hidden md:block text-right">
-            <p id="nexusDate" class="text-[10px] text-slate-500 font-black uppercase tracking-widest"></p>
-            <p class="text-blue-500 font-black text-xs italic">V12 TOTAL RECALL</p>
         </div>
     </header>
 
-    <div class="flex flex-col md:flex-row gap-4 flex-1 min-h-0 overflow-hidden">
-        <aside id="radarPanel" onclick="focusPanel('radarPanel')" class="glass h-1/2 md:h-full md:w-80 p-6 flex flex-col gap-4 overflow-hidden cursor-pointer relative">
-            <div class="flex justify-between border-b border-blue-500/10 pb-4">
-                <button onclick="switchAside('radar')" id="radarTab" class="text-[11px] font-black text-blue-400 uppercase tracking-widest border-b-2 border-blue-500 pb-2 transition-all">RADAR</button>
-                <button onclick="switchAside('leader')" id="leaderTab" class="text-[11px] font-black text-slate-500 uppercase tracking-widest pb-2 transition-all">LİDERLER</button>
+    <div class="flex flex-col md:flex-row gap-2 flex-1 min-h-0 overflow-hidden">
+        <aside id="radarPanel" onclick="focusPanel('radarPanel')" class="glass h-1/2 md:h-full md:w-64 p-4 flex flex-col gap-3 overflow-hidden cursor-pointer relative">
+            <div class="flex justify-around border-b border-blue-500/10 pb-2">
+                <button onclick="switchAside('radar')" class="text-[10px] font-black text-blue-400 tracking-widest uppercase">RADAR</button>
+                <button onclick="switchAside('leader')" class="text-[10px] font-black text-amber-500 tracking-widest uppercase">LIDERLER</button>
             </div>
-            <div id="radar" class="flex flex-col gap-3 overflow-y-auto no-scrollbar flex-1"></div>
-            <div id="leaderboard" class="hidden flex flex-col gap-3 overflow-y-auto no-scrollbar flex-1"></div>
+            <div id="radar" class="flex flex-col gap-2 overflow-y-auto no-scrollbar flex-1"></div>
+            <div id="leaderboard" class="hidden flex flex-col gap-1 overflow-y-auto no-scrollbar flex-1"></div>
         </aside>
 
-        <section class="glass flex-1 flex flex-col items-center justify-center p-8 relative">
-            <div id="display">00:00:00</div>
-            <div class="flex gap-8 w-full max-w-md mt-16">
-                <button id="startBtn" class="flex-1 py-8 bg-slate-800 text-slate-600 rounded-[40px] font-black text-2xl uppercase tracking-widest cursor-not-allowed border border-white/5">YÜKLENİYOR</button>
-                <button id="stopBtn" class="hidden flex-1 py-8 bg-red-600 rounded-[40px] font-black text-2xl animate-pulse uppercase tracking-widest text-white shadow-2xl shadow-red-600/50">DURDUR</button>
+        <section class="glass flex-1 flex flex-col items-center justify-center p-4 relative">
+            <div class="flex items-center gap-4">
+                <div id="display">00:00:00</div>
+                <button onclick="saveDay()" class="bg-amber-600/20 border border-amber-500/50 px-4 py-2 rounded-xl text-[10px] font-black text-amber-500 uppercase h-fit">MUHURLE</button>
             </div>
-            <button onclick="triggerSealSelection()" class="mt-10 bg-amber-600/10 border-2 border-amber-500/30 px-10 py-4 rounded-3xl text-[11px] font-black text-amber-500 uppercase hover:bg-amber-600 hover:text-white transition-all shadow-lg">GÜNÜ MÜHÜRLE</button>
+            <div class="flex gap-4 w-full max-w-xs mt-8">
+                <button id="startBtn" class="flex-1 py-6 bg-blue-600 rounded-3xl font-black text-2xl shadow-xl active:scale-95">ODAKLAN</button>
+                <button id="stopBtn" class="hidden flex-1 py-6 bg-red-600 rounded-3xl font-black text-2xl animate-pulse text-white">DURDUR</button>
+            </div>
         </section>
     </div>
 
-    <footer id="chartPanel" onclick="focusPanel('chartPanel')" class="glass h-36 p-4 shrink-0 cursor-pointer overflow-hidden">
+    <footer id="chartPanel" onclick="focusPanel('chartPanel')" class="glass h-24 md:h-32 p-2 shrink-0 overflow-hidden cursor-pointer relative">
         <canvas id="mainChart"></canvas>
     </footer>
 
-    <div id="nexusModal" class="fixed inset-0 bg-black/99 z-[15000] hidden items-center justify-center p-4">
-        <div class="bg-[#0d1117] border-2 border-blue-600 p-10 rounded-[50px] w-full max-w-3xl text-center relative max-h-[90vh] flex flex-col overflow-hidden shadow-[0_0_100px_rgba(59,130,246,0.2)]">
-            
-            <div id="medalGrid" class="grid grid-cols-4 sm:grid-cols-5 gap-4 hidden overflow-y-auto no-scrollbar p-2"></div>
-            
-            <div id="medalDetail" class="hidden flex-1 flex flex-col items-center justify-center scale-up-center">
-                <div id="detIcon" class="text-[10rem] mb-10 filter drop-shadow-[0_0_40px_rgba(0,255,213,0.4)]"></div>
-                <h2 id="detTitle" class="text-amber-500 font-black text-4xl mb-6 uppercase tracking-tighter italic"></h2>
-                <p id="detDesc" class="text-slate-200 text-2xl italic leading-relaxed px-12 font-medium"></p>
-                <button onclick="showMedalList()" class="mt-12 text-blue-400 font-black text-xs uppercase underline tracking-[0.2em]">KOLEKSİYONA DÖN</button>
-            </div>
-
-            <div id="profileView" class="hidden flex-1 flex flex-col overflow-hidden">
-                <div id="pUserIcon" class="w-24 h-24 mx-auto rounded-full border-4 border-blue-600 mb-6 overflow-hidden bg-slate-950"></div>
-                <h2 id="pUserName" class="text-blue-400 font-black text-3xl mb-4 uppercase italic tracking-widest"></h2>
-                <div class="flex-1 bg-slate-900/80 rounded-[40px] p-6 min-h-[350px] border border-slate-800 mb-6">
-                    <canvas id="profileChart"></canvas>
-                </div>
-            </div>
-
-            <div id="standardView" class="flex-1 flex flex-col items-center justify-center">
-                <div id="mIcon" class="text-[8rem] mb-10 drop-shadow-[0_0_20px_rgba(59,130,246,0.3)]">📜</div>
-                <h2 id="mTitle" class="text-blue-500 font-black text-3xl mb-6 uppercase tracking-tighter italic">NEXUS DOKTRİNİ</h2>
-                <p id="quoteText" class="text-slate-200 text-xl italic leading-relaxed px-10 font-medium"></p>
-            </div>
-
-            <button onclick="closeModal()" class="w-full py-6 bg-blue-600 text-white rounded-[25px] font-black text-sm uppercase mt-8 tracking-[0.4em] hover:bg-blue-500 transition-all">PROTOKOLÜ KAPAT</button>
-        </div>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, update, onValue, get, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, update, onValue, get, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        const firebaseConfig = { 
-            apiKey: "AIzaSy...", 
-            authDomain: "yks-odak.firebaseapp.com", 
-            projectId: "yks-odak", 
-            databaseURL: "https://yks-odak-default-rtdb.europe-west1.firebasedatabase.app" 
-        };
+        const firebaseConfig = { apiKey: "AIzaSy...", authDomain: "yks-odak.firebaseapp.com", projectId: "yks-odak", databaseURL: "https://yks-odak-default-rtdb.europe-west1.firebasedatabase.app" };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        let MY_NAME = localStorage.getItem('nexus_user'), timerInterval, myChart, profChart, modelsLoaded = false, aiInterval, faceNotFoundCount = 0;
-        const MAX_TOLERANCE = 4; // Kafa eğikliği için daha geniş tolerans
+        let MY_NAME = localStorage.getItem('nexus_user'), MY_SESSION = localStorage.getItem('nexus_session') || Math.random().toString(36).substr(2, 10);
+        localStorage.setItem('nexus_session', MY_SESSION);
+        let timerInterval, myChart, profChart, MY_DATA = {};
 
-        // 📜 40 ADET DOKTRİN (TAM HAVUZ)
-        const DOKTRIN = [
-            "Zafer; terini kandan, uykusunu hayallerinden ayıramayanların tek sadık dostudur.",
-            "Nikola Tesla'nın zihnindeki fırtınalar, o masadaki mutlak sessizlikte dindi.",
+        // --- ULTRA SENSITIVE AI ENGINE (2 MIN BUFFER) ---
+        let detector, aiInterval, bufferSeconds = 0;
+
+        const DOKTRINLER = [
+            "Zafer; terini kandan ayıramayanların tek dostudur.",
             "Acı seni terk edene kadar o masadan kalkmayacaksın.",
-            "Rakiplerinin uyuduğu her saniye, senin zirveye giden basamağındır.",
-            "Mükemmellik bir anlık eylem değil, her gün tekrarlanan bir alışkanlıktır.",
-            "Zayıflık, masadan kalktığın an başlar. Güç ise 'bir sayfa daha' diyebildiğin eşiktedir.",
-            "Zaman, geri alınamayan tek sermayendir. Onu çarçur eden geleceğini yakar.",
-            "Senin rakiplerin şu an bir bahane uyduruyor. Sen ise tarih yazıyorsun.",
-            "Bugün hissettiğin yorgunluk, yarınki pişmanlıktan çok daha hafiftir.",
-            "Masa senin savaş alanındır. Kitaplar silahların, kalemlerin ise cephanendir.",
-            "İrade bir kastır; zorlamadıkça büyümez.",
-            "Konfor alanı, muhteşem fikirlerin ve hayallerin öldüğü bir mezarlıktır.",
-            "Gelecekteki 'sen', bugünkü 'sen'e gözyaşları içinde teşekkür etmeli.",
-            "Sınırlar zihindedir, masada değil. Zihnini aşarsan dünyayı aşarsın.",
-            "Bir aslan avına odaklandığında çevresindeki hiçbir gürültüyü duymaz.",
-            "Disiplin, özgürlüğün tek gerçek anahtarıdır.",
-            "Başarı merdivenlerini ellerin cebinde tırmanamazsın.",
-            "O kitap bittiğinde sen de değişmiş olacaksın.",
-            "Yorgunluk geçer, ama bitirememenin verdiği o eziklik ömür boyu sürer.",
-            "Karanlığa küfretmektense bir mum yak. O mum senin kalemindir.",
-            "Şu an çalışmadığın her saniye için bir bedel ödeyeceksin.",
-            "Acı çekmekten korkma. Acı, potansiyelinin genişleme sesidir.",
-            "En iyi intikam, devasa bir başarıdır.",
-            "Seni durdurabilecek tek kişi, aynada gördüğün o kişidir.",
-            "Şampiyonlar salonlarda değil, kendilerinden bir şey daha kattıkları o masalarda doğar.",
-            "Kartallar sadece yükseğe uçmaz, fırtınada bile kanat çırparlar.",
-            "Bir gün her şey bittiğinde, 'iyi ki' demek için şimdi 'keşke'lerini feda et.",
-            "Zeka seni başlatır, disiplin seni bitiş çizgisine götürür.",
-            "Dünyanın en iyi planı bile, uygulama olmadan bir hiçtir.",
-            "Sen bir kurban değil, kendi hayatının mimarısın.",
-            "Odanın içindeki sessizlik, geleceğindeki alkış seslerinin hazırlığıdır.",
-            "Hedefin güneş olsun, ıskalarsan bile yıldızların arasında kalırsın.",
-            "Vazgeçmek için her zaman bir nedenin olacak, ama devam etmek için tek bir hayalin var.",
-            "Kaçtığın her zorluk, ileride karşına daha büyük bir canavar olarak çıkacak.",
-            "Odaklanma, gürültüye rağmen fısıltıyı duyabilmektir.",
-            "İnsanlar ne dediğine değil, neyi başardığına bakarlar.",
-            "Zirve soğuktur ama manzarası muhteşemdir.",
-            "Sabah uyandığında bir amacın yoksa, uyanmanın da bir anlamı yoktur.",
-            "Her gün %1 daha iyi ol. Yıl sonunda dev bir devrim yapmış olacaksın.",
-            "Nexus Titan Protokolü asla uyumaz. Sen de uyuma."
+            "Rakiplerinin uyuduğu her saniye senin için bir basamaktır.",
+            "Masa senin savaş alanındır. Kazanamadan o mevziden ayrılma."
         ];
 
-        // 🎖️ 20 ADET MADALYA (TAM HAVUZ)
         const MEDALS = [
-            {i:'👑', t:'NEXUS KRALI', d:'500+ saat toplam odaklanma süresi. Nexus evreninin mutlak hakimi.'},
-            {i:'⚔️', t:'GLADYATÖR', d:'Günde 10 saatten fazla çalışarak arenayı domine eden efsanevi savaşçı.'},
-            {i:'💎', t:'ELMAS İRADE', d:'Kesintisiz 3 saat mola vermeden odaklanmayı başaran ultra disiplinli zihin.'},
-            {i:'🛡️', t:'MUHAFIZ', d:'Gece 04:00\'e kadar masada kalarak kutsal nöbeti sürdüren gece operatörü.'},
-            {i:'🔥', t:'ALEV ALAN', d:'7 gün boyunca üst üste mühürleme yapan sarsılmaz istikrar abidesi.'},
-            {i:'🌪️', t:'FIRTINA', d:'Tek bir günde 12 saatlik çalışma barajını yıkan, durdurulamaz doğal afet.'},
-            {i:'🦾', t:'CYBORG', d:'Duygularından arınmış, sadece sonuca odaklı haftalık 70 saat mesai canavarı.'},
-            {i:'🦁', t:'ASLAN', d:'Cesaretiyle en zor konulardan bile kaçmayan, korkusuz lider ruhlu operatör.'},
-            {i:'🦉', t:'GECE BAYKUŞU', d:'Güneş battıktan sonra verimliliği zirve yapan karanlıkların efendisi.'},
-            {i:'⚡', t:'YILDIRIM', d:'Sabah 06:00\'da ilk girişi yapan, şafak operasyonu uzmanı erken kalkan.'},
-            {i:'🧘', t:'ZEN USTASI', d:'Derin odak modunda 100 saat geçirmiş, zihnini tamamen susturabilen bilge.'},
-            {i:'🦅', t:'KARTAL GÖZÜ', d:'Gözünü kitaptan bir saniye bile ayırmayan, saniyede binlerce veri işleyen dikkat.'},
-            {i:'🏛️', t:'MİMAR', d:'Programına saniye saniye sadık kalan, kendi başarısını milim milim inşa eden deha.'},
-            {i:'🏹', t:'AVCI', d:'Hedeflediği konuyu bitirmeden masadan asla kalkmayan, avını bırakmayan takipçi.'},
-            {i:'🌋', t:'VOLKAN', d:'Çalışmaya başladığında çevresindeki her şeyi ısıtan, durdurulamaz bir enerji odağı.'},
-            {i:'❄️', t:'SOĞUKKANLI', d:'Baskı altında odağını bozmayan, sınav stresini buz gibi bir iradeyle yöneten.'},
-            {i:'⛩️', t:'SHOGUN', d:'Liderlik tablosunda haftalarca zirveyi kimseye bırakmayan mutlak otorite.'},
-            {i:'🔭', t:'KAŞİF', d:'Yeni çalışma metodlarını başarıyla keşfedip sisteme adapte eden yenilikçi zihin.'},
-            {i:'🧪', t:'SİMYACI', d:'Yorgunluğu, uykusuzluğu ve stresi altına (başarıya) dönüştüren dönüşüm ustası.'},
-            {i:'🌌', t:'OMEGA', d:'Nexus sisteminin tüm sırlarına ve seviyelerine vakıf olmuş son aşama operatör.'}
+            {i:'👑', t:'NEXUS KRALI', d:'500+ saat toplam odaklanma.'},
+            {i:'⚔️', t:'GLADYATÖR', d:'Günde 10 saatten fazla çalışma.'},
+            {i:'💎', t:'ELMAS İRADE', d:'Kesintisiz 3 saat odaklanma.'}
         ];
 
-        async function loadAiModels() {
-            const bar = document.getElementById('loadingBar');
-            const btn = document.getElementById('startBtn');
-            try {
-                const URL = 'https://justadudewhohacks.github.io/face-api.js/weights';
-                bar.style.width = "40%";
-                await faceapi.nets.tinyFaceDetector.loadFromUri(URL);
-                bar.style.width = "100%";
-                modelsLoaded = true;
-                btn.innerText = "ODAKLAN";
-                btn.className = "flex-1 py-8 bg-blue-600 text-white rounded-[40px] font-black text-2xl uppercase tracking-widest shadow-2xl shadow-blue-600/30";
-                setTimeout(() => bar.style.display = 'none', 1000);
-            } catch (e) { alert("AI Yükleme Hatası!"); }
+        async function initAI() {
+            const model = poseDetection.SupportedModels.MoveNet;
+            detector = await poseDetection.createDetector(model, { 
+                modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER 
+            });
         }
 
-        async function startAiEye() {
-            const video = document.getElementById('aiEye');
-            const status = document.getElementById('aiStatus');
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                video.srcObject = stream;
-                status.style.display = 'block';
-                faceNotFoundCount = 0;
-                
-                aiInterval = setInterval(async () => {
-                    if(!video.srcObject) return;
-                    const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 160, scoreThreshold: 0.1 }));
-                    
-                    if (detections.length === 0) {
-                        faceNotFoundCount++;
-                        status.innerText = `OPERATÖR ARANIYOR (${MAX_TOLERANCE - faceNotFoundCount + 1})`;
-                        status.classList.replace('text-blue-400', 'text-red-500');
-                        document.getElementById('mainBody').classList.add('warning-glow');
-                        if (faceNotFoundCount >= MAX_TOLERANCE) { document.getElementById('stopBtn').click(); }
-                    } else {
-                        faceNotFoundCount = 0;
-                        status.innerText = "SİSTEM GÖZETİMİ: AKTİF";
-                        status.classList.replace('text-red-500', 'text-blue-400');
-                        document.getElementById('mainBody').classList.remove('warning-glow');
+        async function startAiTracking() {
+            const video = document.createElement('video');
+            video.id = "aiVideo";
+            video.style.display = "none";
+            document.body.appendChild(video);
+
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+            video.srcObject = stream;
+            await video.play();
+
+            document.getElementById('aiStatusTag').style.display = 'block';
+            document.getElementById('aiStatusTag').innerText = "AI ACTIVE: 120S BUFFER";
+
+            aiInterval = setInterval(async () => {
+                if (detector && video) {
+                    const poses = await detector.estimatePoses(video);
+                    let isPresent = false;
+
+                    if(poses.length > 0) {
+                        // ULTRA HASSAS NOKTA ANALİZİ: Baş, omuz, kulak veya dirsekten en ufak bir kıpırtı (0.01) yeterli.
+                        const kp = poses[0].keypoints;
+                        const crucialPoints = [0, 3, 4, 5, 6, 7, 8]; 
+                        isPresent = crucialPoints.some(index => kp[index] && kp[index].score > 0.01);
                     }
-                }, 5000);
-            } catch (e) { alert("Kamera izni gerekli!"); }
-        }
 
-        function drawChart(id, history, isMain) {
-            const ctx = document.getElementById(id).getContext('2d');
-            const days = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
-            const data = days.map(d => Math.floor((history[d]||0)/60000));
-            const config = {
-                type: 'bar',
-                data: { labels: days, datasets: [{ data, backgroundColor: '#3b82f6', borderRadius: 15 }] },
-                options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#475569', font: { weight: '900', size: 10 } } } } }
-            };
-            if(isMain) { if(myChart) myChart.destroy(); myChart = new Chart(ctx, config); }
-            else { if(profChart) profChart.destroy(); profChart = new Chart(ctx, config); }
-        }
-
-        // --- MÜHÜRLEME SİSTEMİ (V12 ÖZEL) ---
-        window.triggerSealSelection = () => {
-            document.getElementById('sealSelection').style.display = 'flex';
-        };
-
-        window.executeSeal = (type) => {
-            const days = ['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'];
-            let n = new Date().getDay();
-            if(type === 'DU') n = n === 0 ? 6 : n - 1; // Düne git
-            
-            const target = days[n];
-            get(ref(db, `users/${MY_NAME}`)).then(s => {
-                const v = s.val() || {}, h = v.history || {};
-                h[target] = (h[target] || 0) + (v.pendingTime || 0);
-                update(ref(db, `users/${MY_NAME}`), { pendingTime: 0, timerActive: false, history: h });
-                document.getElementById('sealSelection').style.display = 'none';
-                alert(`Süre ${target} gününe mühürlendi.`);
-            });
-        };
-
-        // --- MODERATÖR (ADMIN) FONKSİYONLARI ---
-        window.adminUpdate = (action) => {
-            const user = document.getElementById('targetUser').value.trim().toUpperCase();
-            const mins = parseInt(document.getElementById('manualTime').value) || 0;
-            if(!user) return;
-            
-            if(action === 'set') {
-                update(ref(db, `users/${user}`), { pendingTime: mins * 60000 });
-                alert(`${user} süresi ${mins} dakika yapıldı.`);
-            } else {
-                set(ref(db, `users/${user}/history`), {});
-                update(ref(db, `users/${user}`), { pendingTime: 0 });
-                alert(`${user} verileri sıfırlandı.`);
-            }
-        };
-
-        window.addEventListener('keydown', (e) => {
-            if(e.key.toLowerCase() === 'l') {
-                const pass = prompt("SİSTEM ŞİFRESİ:");
-                if(pass === "1905") document.getElementById('adminPanel').style.display = 'flex';
-            }
-        });
-
-        // --- DİĞER FONKSİYONLAR ---
-        window.openProfile = (name) => {
-            get(ref(db, `users/${name}`)).then(s => {
-                const d = s.val() || {};
-                document.getElementById('pUserName').innerText = name;
-                document.getElementById('pUserIcon').innerHTML = `<img src="https://api.dicebear.com/7.x/bottts/svg?seed=${name}">`;
-                document.getElementById('standardView').classList.add('hidden');
-                document.getElementById('medalGrid').classList.add('hidden');
-                document.getElementById('profileView').classList.remove('hidden');
-                document.getElementById('nexusModal').classList.replace('hidden', 'flex');
-                drawChart('profileChart', d.history || {}, false);
-            });
-        };
-
-        window.openMedals = () => {
-            const grid = document.getElementById('medalGrid');
-            grid.innerHTML = MEDALS.map((m, idx) => `<div class="medal-box" onclick="zoomMedal(${idx})"><span class="text-3xl">${m.i}</span><span class="text-[9px] font-black mt-2 text-blue-400 uppercase">${m.t}</span></div>`).join('');
-            document.getElementById('profileView').classList.add('hidden');
-            document.getElementById('standardView').classList.add('hidden');
-            document.getElementById('medalDetail').classList.add('hidden');
-            grid.classList.remove('hidden');
-            document.getElementById('nexusModal').classList.replace('hidden', 'flex');
-        };
-
-        window.zoomMedal = (idx) => {
-            const m = MEDALS[idx];
-            document.getElementById('detIcon').innerText = m.i;
-            document.getElementById('detTitle').innerText = m.t;
-            document.getElementById('detDesc').innerText = m.d;
-            document.getElementById('medalGrid').classList.add('hidden');
-            document.getElementById('medalDetail').classList.remove('hidden');
-        };
-
-        window.showMedalList = () => {
-            document.getElementById('medalDetail').classList.add('hidden');
-            document.getElementById('medalGrid').classList.remove('hidden');
-        };
-
-        window.openQuote = () => {
-            document.getElementById('quoteText').innerText = DOKTRIN[Math.floor(Math.random()*DOKTRIN.length)];
-            document.getElementById('profileView').classList.add('hidden');
-            document.getElementById('medalGrid').classList.add('hidden');
-            document.getElementById('medalDetail').classList.add('hidden');
-            document.getElementById('standardView').classList.remove('hidden');
-            document.getElementById('nexusModal').classList.replace('hidden', 'flex');
-        };
-
-        function initNexus() {
-            loadAiModels();
-            document.getElementById('nexusDate').innerText = new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            
-            onValue(ref(db, `users/${MY_NAME}`), (s) => {
-                const d = s.val() || {};
-                document.getElementById('userName').innerText = MY_NAME;
-                document.getElementById('pAvatar').innerHTML = `<img src="https://api.dicebear.com/7.x/bottts/svg?seed=${MY_NAME}">`;
-                if(timerInterval) clearInterval(timerInterval);
-                if(d.timerActive) {
-                    document.getElementById('startBtn').classList.add('hidden'); document.getElementById('stopBtn').classList.remove('hidden');
-                    timerInterval = setInterval(() => {
-                        const ms = (d.pendingTime || 0) + (Date.now() - d.startTime);
-                        const h = Math.floor(ms/3600000).toString().padStart(2,'0'), m = Math.floor((ms%3600000)/60000).toString().padStart(2,'0'), sc = Math.floor((ms%60000)/1000).toString().padStart(2,'0');
-                        document.getElementById('display').innerText = `${h}:${m}:${sc}`;
-                    }, 1000);
-                } else {
-                    document.getElementById('startBtn').classList.remove('hidden'); document.getElementById('stopBtn').classList.add('hidden');
-                    const ms = d.pendingTime || 0;
-                    const h = Math.floor(ms/3600000).toString().padStart(2,'0'), m = Math.floor((ms%3600000)/60000).toString().padStart(2,'0'), sc = Math.floor((ms%60000)/1000).toString().padStart(2,'0');
-                    document.getElementById('display').innerText = `${h}:${m}:${sc}`;
+                    if (!isPresent) {
+                        bufferSeconds++;
+                        // Görsel uyarı: Süre azaldıkça kenarlık kırmızılaşır.
+                        document.body.style.border = `10px solid rgba(239, 68, 68, ${bufferSeconds / 120})`;
+                        
+                        if (bufferSeconds >= 120) { // TAM 2 DAKİKA TOLERANS
+                            document.getElementById('stopBtn').click();
+                            alert("SİSTEM: 2 DAKİKADIR HAREKET TESPİT EDİLMEDİ. SÜRE DURDURULDU.");
+                        }
+                    } else {
+                        bufferSeconds = 0; // Hareket varsa toleransı sıfırla
+                        document.body.style.border = "0px solid transparent";
+                    }
                 }
-                drawChart('mainChart', d.history || {}, true);
-            });
-
-            onValue(ref(db, 'users'), (s) => {
-                const users = s.val() || {};
-                const radar = document.getElementById('radar');
-                const leader = document.getElementById('leaderboard');
-                radar.innerHTML = ""; leader.innerHTML = "";
-                const userList = Object.entries(users).sort((a,b) => (b[1].pendingTime||0) - (a[1].pendingTime||0));
-                
-                userList.forEach(([name, u], idx) => {
-                    const rDiv = document.createElement('div');
-                    rDiv.className = `p-5 glass flex justify-between items-center mb-1 ${u.timerActive ? 'border-l-4 border-green-500 bg-green-500/5' : ''}`;
-                    rDiv.onclick = () => openProfile(name);
-                    rDiv.innerHTML = `<span class='text-[10px] font-black'>${name}</span><span class='text-[9px] ${u.timerActive ? 'text-green-400' : 'text-slate-600'}'>${u.timerActive ? '● AKTİF' : 'ÇEVRİMDIŞI'}</span>`;
-                    radar.appendChild(rDiv);
-
-                    const lDiv = document.createElement('div');
-                    lDiv.className = "p-5 glass flex justify-between items-center mb-1";
-                    lDiv.innerHTML = `<span class='text-[10px] font-black'>#${idx+1} ${name}</span><span class='text-[11px] text-amber-500 font-black'>${Math.floor((u.pendingTime||0)/60000)} DK</span>`;
-                    leader.appendChild(lDiv);
-                });
-            });
+            }, 1000);
         }
 
         document.getElementById('entryBtn').onclick = async () => {
             const name = document.getElementById('opInput').value.trim().toUpperCase();
-            if(name.length < 2) return;
+            if(name.length < 2) return alert("HATA");
+            await update(ref(db, `users/${name}/status`), { name, lastSession: MY_SESSION, avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${name}` });
             localStorage.setItem('nexus_user', name); MY_NAME = name;
-            await update(ref(db, `users/${name}`), { name, avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${name}` });
-            document.getElementById('loginModal').style.display = 'none';
-            initNexus();
+            document.getElementById('loginModal').style.display = 'none'; initNexus();
         };
 
-        document.getElementById('startBtn').onclick = () => { if(modelsLoaded) { startAiEye(); update(ref(db, `users/${MY_NAME}`), { timerActive: true, startTime: Date.now() }); } };
-        document.getElementById('stopBtn').onclick = () => {
-            clearInterval(aiInterval);
-            const video = document.getElementById('aiEye'); if(video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
-            document.getElementById('aiStatus').style.display = 'none';
-            document.getElementById('mainBody').classList.remove('warning-glow');
-            get(ref(db, `users/${MY_NAME}`)).then(s => { const v = s.val(); update(ref(db, `users/${MY_NAME}`), { timerActive: false, pendingTime: (v.pendingTime || 0) + (Date.now() - v.startTime) }); });
+        if(MY_NAME) { 
+            get(ref(db, `users/${MY_NAME}`)).then(s => {
+                if(!s.exists()) { localStorage.clear(); location.reload(); }
+                else { document.getElementById('loginModal').style.display = 'none'; initNexus(); }
+            });
+        }
+
+        function initNexus() {
+            initAI();
+            onValue(ref(db, `users/${MY_NAME}`), (snap) => {
+                MY_DATA = snap.val() || {};
+                if(!MY_DATA.status) return; 
+                document.getElementById('userName').innerText = MY_NAME;
+                document.getElementById('pAvatar').innerHTML = `<img src="${MY_DATA.status?.avatar}" class="w-full h-full">`;
+                if(timerInterval) clearInterval(timerInterval);
+                if(MY_DATA.timerActive) {
+                    document.getElementById('startBtn').classList.add('hidden'); document.getElementById('stopBtn').classList.remove('hidden');
+                    timerInterval = setInterval(() => updateDisplay((MY_DATA.pendingTime||0) + (Date.now() - MY_DATA.startTime)), 1000);
+                } else {
+                    document.getElementById('startBtn').classList.remove('hidden'); document.getElementById('stopBtn').classList.add('hidden');
+                    updateDisplay(MY_DATA.pendingTime || 0);
+                }
+                drawChart('mainChart', MY_DATA.history || {}, true);
+            });
+
+            onValue(ref(db, 'users'), (snap) => {
+                const users = snap.val() || {};
+                const r = document.getElementById('radar'); r.innerHTML = "";
+                const l = document.getElementById('leaderboard'); l.innerHTML = "";
+                const d = ['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'], today = d[new Date().getDay()];
+                const userList = Object.entries(users).map(([name, u]) => {
+                    const currentWork = (u.pendingTime || 0) + (u.timerActive ? (Date.now() - u.startTime) : 0);
+                    const totalToday = (u.history?.[today] || 0) + currentWork;
+                    return { name, totalToday, avatar: u.status?.avatar, active: u.timerActive, raw: u };
+                }).sort((a, b) => b.totalToday - a.totalToday);
+
+                userList.forEach((u, i) => {
+                    const div = document.createElement('div');
+                    div.className = `p-3 glass flex justify-between items-center mb-1 ${u.active?'border-l-4 border-green-500':''}`;
+                    div.innerHTML = `<div class="flex items-center gap-2 text-[11px] font-black"><img src="${u.avatar}" class="w-6 rounded-full"> ${u.name}</div><span class="text-[10px] text-blue-400">${Math.floor(u.totalToday/60000)} DK</span>`;
+                    div.onclick = () => showUserProfile(u.name, u.raw);
+                    r.appendChild(div);
+                    const lRow = document.createElement('div');
+                    lRow.className = `leader-row ${i<3?'rank-'+(i+1):''}`;
+                    lRow.innerHTML = `<span>${i+1}. ${u.name}</span><span>${Math.floor(u.totalToday/60000)}dk</span>`;
+                    l.appendChild(lRow);
+                });
+            });
+        }
+
+        window.switchAside = (type) => {
+            document.getElementById('radar').classList.toggle('hidden', type !== 'radar');
+            document.getElementById('leaderboard').classList.toggle('hidden', type !== 'leader');
         };
 
-        window.switchAside = (t) => {
-            document.getElementById('radar').classList.toggle('hidden', t==='leader');
-            document.getElementById('leaderboard').classList.toggle('hidden', t==='radar');
-            document.getElementById('radarTab').className = t==='radar' ? "text-[11px] font-black text-blue-400 border-b-2 border-blue-500 pb-2 transition-all" : "text-[11px] font-black text-slate-500 pb-2 transition-all";
-            document.getElementById('leaderTab').className = t==='leader' ? "text-[11px] font-black text-amber-500 border-b-2 border-amber-500 pb-2 transition-all" : "text-[11px] font-black text-slate-500 pb-2 transition-all";
+        window.showUserProfile = (name, data) => {
+            document.getElementById('mIcon').innerHTML = `<img src="${data.status?.avatar}" class="w-16 h-16 mx-auto rounded-full border-2 border-blue-600">`;
+            document.getElementById('mTitle').innerText = name;
+            document.getElementById('mDesc').innerText = `TOPLAM: ${Math.floor((Object.values(data.history||{}).reduce((a,b)=>a+b,0) + (data.pendingTime||0))/60000)} DK`;
+            document.getElementById('profileIntel').classList.remove('hidden');
+            document.getElementById('quoteText').classList.add('hidden');
+            document.getElementById('medalGrid').classList.add('hidden');
+            document.getElementById('nexusModal').classList.replace('hidden', 'flex');
+            setTimeout(() => drawChart('profileChart', data.history || {}, false), 100);
+        };
+
+        window.openQuote = () => {
+            document.getElementById('profileIntel').classList.add('hidden');
+            document.getElementById('quoteText').classList.remove('hidden');
+            document.getElementById('medalGrid').classList.add('hidden');
+            document.getElementById('mTitle').innerText = "DOKTRIN";
+            document.getElementById('quoteText').innerText = DOKTRINLER[Math.floor(Math.random()*DOKTRINLER.length)];
+            document.getElementById('nexusModal').classList.replace('hidden', 'flex');
+        };
+
+        window.openMedals = () => {
+            const grid = document.getElementById('medalGrid'); grid.innerHTML = "";
+            grid.classList.remove('hidden'); document.getElementById('profileIntel').classList.add('hidden'); document.getElementById('quoteText').classList.add('hidden');
+            document.getElementById('mTitle').innerText = "MADALYALAR";
+            MEDALS.forEach(m => {
+                const box = document.createElement('div'); box.className = "medal-box"; box.innerText = m.i;
+                box.onclick = () => alert(m.t);
+                grid.appendChild(box);
+            });
+            document.getElementById('nexusModal').classList.replace('hidden', 'flex');
         };
 
         window.closeModal = () => document.getElementById('nexusModal').classList.replace('flex', 'hidden');
-        window.focusPanel = (id) => { document.getElementById('uiOverlay').style.display='block'; document.getElementById(id).classList.add('focus-mode'); };
-        window.closeFocus = () => { document.getElementById('uiOverlay').style.display='none'; document.querySelectorAll('.focus-mode').forEach(e=>e.classList.remove('focus-mode')); };
+        window.focusPanel = (id) => { document.getElementById('uiOverlay').style.display = 'block'; document.getElementById(id).classList.add('focus-mode'); };
+        window.closeFocus = () => { document.getElementById('uiOverlay').style.display = 'none'; document.querySelectorAll('.focus-mode').forEach(e => e.classList.remove('focus-mode')); };
 
-        if(MY_NAME) { document.getElementById('loginModal').style.display = 'none'; initNexus(); }
-    </script>
+        function drawChart(canvasId, history, isMain) {
+            const canvas = document.getElementById(canvasId);
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const data = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'].map(d => Math.floor((history[d]||0)/60000));
+            const chartObj = isMain ? myChart : profChart;
+            if(chartObj && typeof chartObj.destroy === 'function') chartObj.destroy();
+            const newChart = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: ['PT','SA','ÇA','PE','CU','CT','PZ'], datasets: [{ data, backgroundColor: '#3b82f6' }] },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+            if(isMain) myChart = newChart; else profChart = newChart;
+        }
+
+        function updateDisplay(ms) {
+            const h = Math.floor(ms/3600000).toString().padStart(2,'0'), m = Math.floor((ms%3600000)/60000).toString().padStart(2,'0'), s = Math.floor((ms%60000)/1000).toString().padStart(2,'0');
+            document.getElementById('display').innerText = `${h}:${m}:${s}`;
+        }
+
+        document.getElementById('startBtn').onclick = async () => {
+            try {
+                await startAiTracking();
+                update(ref(db, `users/${MY_NAME}`), { timerActive: true, startTime: Date.now() });
+            } catch (e) { alert("KAMERA HATASI"); }
+        };
+
+        document.getElementById('stopBtn').onclick = () => {
+            clearInterval(aiInterval);
+            bufferSeconds = 0;
+            const v = document.getElementById('aiVideo');
+            if(v) { v.srcObject.getTracks().forEach(t => t.stop()); v.remove(); }
+            document.getElementById('aiStatusTag').style.display = 'none';
+            document.body.style.border = "0px solid transparent";
+            get(ref(db, `users/${MY_NAME}`)).then(s => { 
+                const v = s.val(); 
+                update(ref(db, `users/${MY_NAME}`), { timerActive: false, pendingTime: (v.pendingTime||0)+(Date.now()-v.startTime) }); 
+            });
+        };
+
+        window.saveDay = () => {
+            const d = ['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'], n = new Date().getDay();
+            document.getElementById('lDayBtn').innerText = `DUN (${d[(n+6)%7]})`; 
+            document.getElementById('tDayBtn').innerText = `BUGUN (${d[n]})`;
+            document.getElementById('saveBox').style.display = 'flex';
+        };
+
+        window.pSave = (isYesterday) => {
+            const d = ['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'], n = new Date().getDay();
+            const targetDay = d[isYesterday ? (n+6)%7 : n];
+            get(ref(db, `users/${MY_NAME}`)).then(s => {
+                const v = s.val() || {}, h = v.history || {};
+                h[targetDay] = (h[targetDay] || 0) + (v.pendingTime || 0);
+                update(ref(db, `users/${MY_NAME}`), { pendingTime: 0, timerActive: false, history: h });
+                document.getElementById('saveBox').style.display = 'none';
+            });
+        };
+
+        window.addEventListener('keydown', (e) => { if (e.key.toLowerCase() === 'l') document.getElementById('admBox').style.display = 'flex'; });
+
+        window.checkAdm = () => {
+            if(document.getElementById('admPass').value === "1905") {
+                document.getElementById('admAuth').style.display = 'none';
+                document.getElementById('admContent').style.display = 'block';
+                onValue(ref(db, 'users'), (snap) => {
+                    const users = snap.val() || {};
+                    document.getElementById('aUsr').innerHTML = Object.keys(users).map(u => `<option value="${u}">${u}</option>`).join('');
+                }, { onlyOnce: true });
+            }
+        };
+
+        window.mEdit = () => {
+            const user = document.getElementById('aUsr').value, day = document.getElementById('aDay').value, mins = parseInt(document.getElementById('aMin').value) || 0;
+            get(ref(db, `users/${user}`)).then(s => {
+                const v = s.val() || {}, h = v.history || {};
+                h[day] = (h[day] || 0) + (mins * 60000);
+                update(ref(db, `users/${user}`), { history: h }).then(() => alert("OK"));
+            });
+        };
+
+        window.mKick = () => {
+            const user = document.getElementById('aUsr').value;
+            if(confirm("SIL?")) remove(ref(db, `users/${user}`));
+        };
+    </script> 
 </body>
 </html>
