@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="google-site-verification" content="2N1Zh_DNVQ2KbJDJcO0sr9bcn48Jo_T-2rIZKTxCSqk" />
-    <title>NEXUS TITAN OMEGA | TOTAL VOLUME</title>
+    <title>NEXUS TITAN OMEGA | TOTAL VOLUME V3</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -36,9 +36,13 @@
         .rank-3 { color: #cd7f32; }
 
         #aiStatus { position: fixed; bottom: 20px; left: 20px; z-index: 10002; font-size: 10px; font-weight: 900; padding: 6px 12px; border-radius: 20px; display: none; border: 1px solid rgba(239, 68, 68, 0.5); }
+        
+        /* Yeni Yükleme Göstergesi */
+        #loadingBar { height: 2px; width: 0%; background: #3b82f6; position: fixed; top: 0; left: 0; transition: 0.5s; z-index: 30000; }
     </style>
 </head>
 <body>
+    <div id="loadingBar"></div>
     <video id="aiEye" autoplay muted playsinline style="display:none;"></video>
     <div id="aiStatus" class="bg-red-600/20 text-red-500 animate-pulse uppercase tracking-widest">AI GÖZETİMİ AKTİF</div>
     <div id="uiOverlay" class="overlay" onclick="closeFocus()"></div>
@@ -65,7 +69,7 @@
                     <option value="Pzt">PAZARTESİ</option><option value="Sal">SALI</option><option value="Çar">ÇARŞAMBA</option>
                     <option value="Per">PERŞEMBE</option><option value="Cum">CUMA</option><option value="Cmt">CUMARTESİ</option><option value="Paz">PAZAR</option>
                 </select>
-                <input type="number" id="aMin" placeholder="DAKİKA EKLE/ÇIKAR" class="w-full p-4 bg-slate-950 text-white rounded-xl mb-4 text-center font-bold border border-slate-800">
+                <input type="number" id="aMin" placeholder="DAKİKA" class="w-full p-4 bg-slate-950 text-white rounded-xl mb-4 text-center font-bold border border-slate-800">
                 <div class="flex gap-2">
                     <button onclick="mEdit()" class="flex-1 py-4 bg-green-600 rounded-xl font-black uppercase text-[10px] tracking-widest">GÜNCELLE</button>
                     <button onclick="mKick()" class="flex-1 py-4 bg-red-600 rounded-xl font-black uppercase text-[10px] tracking-widest text-white">SİSTEMDEN AT</button>
@@ -76,25 +80,24 @@
     </div>
 
     <div id="loginModal" class="fixed inset-0 bg-[#010409] z-[20000] flex items-center justify-center p-4">
-        <div class="glass p-10 w-full max-w-sm border-blue-600 border-2 text-center shadow-[0_0_50px_rgba(59,130,246,0.2)]">
-            <div class="text-6xl mb-4 animate-pulse">💠</div>
+        <div class="glass p-10 w-full max-w-sm border-blue-600 border-2 text-center">
             <h2 class="text-blue-500 font-black text-3xl mb-8 italic tracking-tighter uppercase">NEXUS OMEGA</h2>
-            <input type="text" id="opInput" placeholder="OPERATÖR KOD ADI" class="w-full bg-slate-950 border border-blue-500/20 p-5 rounded-2xl mb-5 text-white font-black text-center focus:outline-none focus:border-blue-500 uppercase tracking-widest">
-            <button id="entryBtn" class="w-full py-5 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-[0.4em] active:scale-95 transition-all shadow-lg shadow-blue-600/20">SİSTEME GİR</button>
+            <input type="text" id="opInput" placeholder="OPERATÖR KOD ADI" class="w-full bg-slate-950 border border-blue-500/20 p-5 rounded-2xl mb-5 text-white font-black text-center uppercase tracking-widest">
+            <button id="entryBtn" class="w-full py-5 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-[0.4em] active:scale-95 transition-all">SİSTEME GİR</button>
         </div>
     </div>
 
     <header class="glass p-5 shrink-0 flex items-center justify-between">
         <div class="flex items-center gap-4">
-            <div id="pAvatar" class="w-14 h-14 rounded-full border-2 border-blue-600 bg-slate-900 overflow-hidden shadow-lg shadow-blue-500/10"></div>
+            <div id="pAvatar" class="w-14 h-14 rounded-full border-2 border-blue-600 bg-slate-900 overflow-hidden"></div>
             <div>
                 <div class="flex items-center gap-3">
                     <h1 id="userName" class="vip-name text-sm uppercase tracking-widest">OPERATÖR</h1>
-                    <button onclick="openQuote()" class="bg-red-600/10 border border-red-500/30 px-3 py-1 rounded-lg text-[9px] font-black text-red-500 uppercase tracking-tighter">DİSİPLİN UYARISI</button>
+                    <button onclick="openQuote()" class="bg-red-600/10 border border-red-500/30 px-3 py-1 rounded-lg text-[9px] font-black text-red-500 uppercase tracking-tighter">DİSİPLİN</button>
                 </div>
                 <div class="flex gap-5 mt-2">
-                    <span onclick="openQuote()" class="text-[10px] text-blue-400 font-bold cursor-pointer hover:text-white transition-colors uppercase tracking-widest underline decoration-blue-500/30">📜 DOKTRİNLER</span>
-                    <span onclick="openMedals()" class="text-[10px] text-amber-500 font-bold cursor-pointer hover:text-white transition-colors uppercase tracking-widest underline decoration-amber-500/30">🎖️ MADALYALAR</span>
+                    <span onclick="openQuote()" class="text-[10px] text-blue-400 font-bold cursor-pointer uppercase tracking-widest underline decoration-blue-500/30">📜 DOKTRİN</span>
+                    <span onclick="openMedals()" class="text-[10px] text-amber-500 font-bold cursor-pointer uppercase tracking-widest underline decoration-amber-500/30">🎖️ MADALYA</span>
                 </div>
             </div>
         </div>
@@ -111,20 +114,12 @@
         </aside>
 
         <section class="glass flex-1 flex flex-col items-center justify-center p-6 relative">
-            <div class="absolute top-6 left-6 flex flex-col items-start opacity-20">
-                <span class="text-[10px] font-black text-blue-500">SYSTEM: TITAN OMEGA</span>
-                <span class="text-[10px] font-black text-slate-500">ENCRYPTION: AES-256</span>
-            </div>
-            
-            <div class="flex items-center gap-6">
-                <div id="display">00:00:00</div>
-                <button onclick="saveDay()" class="bg-amber-600/10 border border-amber-500/30 px-6 py-3 rounded-2xl text-[10px] font-black text-amber-500 uppercase h-fit hover:bg-amber-500 hover:text-black transition-all">GÜNÜ MÜHÜRLE</button>
-            </div>
-
+            <div id="display">00:00:00</div>
             <div class="flex gap-6 w-full max-w-sm mt-12">
-                <button id="startBtn" class="flex-1 py-7 bg-blue-600 rounded-[30px] font-black text-2xl shadow-xl shadow-blue-600/20 active:scale-95 transition-all uppercase tracking-widest">ODAKLAN</button>
+                <button id="startBtn" class="flex-1 py-7 bg-slate-800 text-slate-500 rounded-[30px] font-black text-xl cursor-not-allowed uppercase tracking-widest">YÜKLENİYOR...</button>
                 <button id="stopBtn" class="hidden flex-1 py-7 bg-red-600 rounded-[30px] font-black text-2xl animate-pulse shadow-xl shadow-red-600/20 active:scale-95 transition-all uppercase tracking-widest text-white">DURDUR</button>
             </div>
+            <button onclick="saveDay()" class="mt-8 bg-amber-600/10 border border-amber-500/30 px-6 py-3 rounded-2xl text-[10px] font-black text-amber-500 uppercase h-fit hover:bg-amber-500 hover:text-black transition-all">GÜNÜ MÜHÜRLE</button>
         </section>
     </div>
 
@@ -133,24 +128,18 @@
     </footer>
 
     <div id="nexusModal" class="fixed inset-0 bg-black/98 z-[15000] hidden items-center justify-center p-4">
-        <div class="bg-[#0d1117] border-2 border-blue-600 p-8 rounded-[40px] w-full max-w-2xl text-center relative max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+        <div class="bg-[#0d1117] border-2 border-blue-600 p-8 rounded-[40px] w-full max-w-2xl text-center relative max-h-[90vh] flex flex-col overflow-hidden">
             <div id="medalGrid" class="grid grid-cols-4 sm:grid-cols-5 gap-4 hidden overflow-y-auto no-scrollbar mb-6 p-2"></div>
-            
             <div id="standardView" class="flex-1 flex flex-col overflow-hidden">
                 <div id="mIcon" class="text-7xl mb-4">📜</div>
-                <h2 id="mTitle" class="text-blue-400 font-black text-2xl mb-2 uppercase tracking-tighter">DOKTRİN ANALİZİ</h2>
-                
+                <h2 id="mTitle" class="text-blue-400 font-black text-2xl mb-2 uppercase">ANALİZ</h2>
                 <div id="profileIntel" class="hidden flex-1 flex flex-col min-h-0">
                     <p id="mDesc" class="text-slate-400 text-sm italic mb-6"></p>
-                    <div class="flex-1 bg-slate-900/40 rounded-3xl p-4 min-h-[250px] border border-slate-800">
-                        <canvas id="profileChart"></canvas>
-                    </div>
+                    <div class="flex-1 bg-slate-900/40 rounded-3xl p-4 min-h-[250px] border border-slate-800"><canvas id="profileChart"></canvas></div>
                 </div>
-                
-                <p id="quoteText" class="text-slate-200 text-lg italic leading-relaxed font-medium px-6 overflow-y-auto no-scrollbar py-4"></p>
+                <p id="quoteText" class="text-slate-200 text-lg italic leading-relaxed font-medium px-6 py-4"></p>
             </div>
-            
-            <button onclick="closeModal()" class="w-full py-5 bg-blue-600 text-white rounded-2xl font-black text-[12px] uppercase mt-6 tracking-[0.3em] active:scale-95 transition-all">PROTOKOLÜ KAPAT</button>
+            <button onclick="closeModal()" class="w-full py-5 bg-blue-600 text-white rounded-2xl font-black text-[12px] uppercase mt-6 tracking-[0.3em]">KAPAT</button>
         </div>
     </div>
 
@@ -158,7 +147,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, update, onValue, get, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // 🔥 FIREBASE YAPILANDIRMASI (BAĞLANTILAR KORUNDU)
         const firebaseConfig = { 
             apiKey: "AIzaSy...", 
             authDomain: "yks-odak.firebaseapp.com", 
@@ -174,7 +162,7 @@
         
         let timerInterval, myChart, profChart, MY_DATA = {}, modelsLoaded = false, aiInterval;
 
-        // 📜 TÜM DOKTRİNLER (HİÇBİRİ SİLİNMEDİ - 37 ADET)
+        // 📜 TÜM DOKTRİNLER (BAKİDİR)
         const DOKTRİN = [
             "Zafer; terini kandan, uykusunu hayallerinden ayıramayanların tek sadık dostudur.",
             "Nikola Tesla'nın zihnindeki fırtınalar, o masadaki mutlak sessizlikte dindi.",
@@ -215,7 +203,7 @@
             "Nexus Omega protokolünde mola yoktur, sadece stratejik yeniden yüklemeler vardır."
         ];
 
-        // 🎖️ TÜM MADALYALAR
+        // 🎖️ TÜM MADALYALAR (BAKİDİR)
         const MEDALS = [
             {i:'👑', t:'NEXUS KRALI', d:'500+ saat toplam odaklanma süresine sahip efsane.'},
             {i:'⚔️', t:'GLADYATÖR', d:'Günde 10 saatten fazla çalışarak arenayı domine edenler.'},
@@ -227,26 +215,43 @@
             {i:'🦁', t:'ASLAN', d:'Cesaretiyle en zor konulardan bile kaçmayan lider.'}
         ];
 
-        // 🧠 AI MERKEZİ ÜNİTESİ (DOĞRUDAN ENTEGRE)
+        // 🧠 AI MERKEZİ ÜNİTESİ - STABİLİZE SİSTEM
         async function loadAiModels() {
-            try {
-                const URL = 'https://justadudewhohacks.github.io/face-api.js/weights';
-                await faceapi.nets.tinyFaceDetector.loadFromUri(URL);
-                await faceapi.nets.faceLandmark68Net.loadFromUri(URL);
-                modelsLoaded = true;
-                const startBtn = document.getElementById('startBtn');
-                startBtn.innerText = "SİSTEM HAZIR: ODAKLAN";
-                console.log("Nexus AI Modülleri Aktif.");
-            } catch (err) {
-                console.error("AI Yükleme Hatası:", err);
-                alert("Yapay Zeka modülleri yüklenemedi. İnternet bağlantınızı kontrol edin.");
+            const bar = document.getElementById('loadingBar');
+            const btn = document.getElementById('startBtn');
+            const sources = [
+                'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights/',
+                'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights/'
+            ];
+
+            async function tryLoad(url) {
+                try {
+                    bar.style.width = "30%";
+                    await faceapi.nets.tinyFaceDetector.loadFromUri(url);
+                    bar.style.width = "70%";
+                    await faceapi.nets.faceLandmark68Net.loadFromUri(url);
+                    bar.style.width = "100%";
+                    return true;
+                } catch (e) { return false; }
             }
+
+            for(let src of sources) {
+                if(await tryLoad(src)) {
+                    modelsLoaded = true;
+                    btn.innerText = "ODAKLAN";
+                    btn.classList.remove('bg-slate-800','text-slate-500','cursor-not-allowed');
+                    btn.classList.add('bg-blue-600','text-white');
+                    setTimeout(() => bar.style.display = 'none', 1000);
+                    return;
+                }
+            }
+            alert("AI Modülleri yüklenemedi. Sayfayı yenileyin veya farklı bir tarayıcı deneyin.");
         }
 
         async function startAiEye() {
             const video = document.getElementById('aiEye');
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240 } });
                 video.srcObject = stream;
                 document.getElementById('aiStatus').style.display = 'block';
                 
@@ -254,12 +259,11 @@
                     if(!video.srcObject) return;
                     const result = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
                     if (result.length === 0) {
-                        console.warn("AI: ODAK KAYBI!");
                         document.getElementById('stopBtn').click();
-                        alert("UYARI: Masada Kimse Algılanamadı! Protokol Durduruldu.");
+                        alert("ODAK KAYBI! Masadan kalktığın için süre durduruldu.");
                     }
-                }, 4000);
-            } catch (err) { alert("AI Kamera Erişimi Reddedildi!"); }
+                }, 5000);
+            } catch (err) { alert("Kamera Erişimi Şart!"); }
         }
 
         function stopAiEye() {
@@ -269,20 +273,18 @@
             document.getElementById('aiStatus').style.display = 'none';
         }
 
-        // 📊 GRAFİK VE UI YÖNETİMİ (ORİJİNAL)
+        // 📊 UI VE SİSTEM MANTIĞI
         window.switchAside = (type) => {
             document.getElementById('radar').classList.toggle('hidden', type !== 'radar');
             document.getElementById('leaderboard').classList.toggle('hidden', type !== 'leader');
         };
 
         window.closeModal = () => document.getElementById('nexusModal').classList.replace('flex', 'hidden');
-        
         window.focusPanel = (id) => { 
             document.getElementById('uiOverlay').style.display = 'block'; 
             document.getElementById(id).classList.add('focus-mode'); 
             if(myChart) setTimeout(() => myChart.resize(), 300); 
         };
-
         window.closeFocus = () => { 
             document.getElementById('uiOverlay').style.display = 'none'; 
             document.querySelectorAll('.focus-mode').forEach(e => e.classList.remove('focus-mode')); 
@@ -303,31 +305,24 @@
             
             const cfg = {
                 type: 'bar',
-                data: { labels: ['PT','SA','ÇA','PE','CU','CT','PZ'], datasets: [{ data, backgroundColor: '#3b82f6', borderRadius: 8, barThickness: 12 }] },
-                options: { 
-                    maintainAspectRatio: false, 
-                    plugins: { legend: { display: false } }, 
-                    scales: { 
-                        y: { display: false }, 
-                        x: { grid: { display: false }, ticks: { color: '#475569', font: { size: 9, weight: 'bold' } } } 
-                    } 
-                }
+                data: { labels: ['PT','SA','ÇA','PE','CU','CT','PZ'], datasets: [{ data, backgroundColor: '#3b82f6', borderRadius: 8 }] },
+                options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false } } }
             };
             if(isMain) myChart = new Chart(ctx, cfg); else profChart = new Chart(ctx, cfg);
         }
 
-        // ⚙️ EVENT HANDLERS (BAĞLANTILAR)
+        // ⚙️ EVENT HANDLERS
         document.getElementById('entryBtn').onclick = async () => {
             const name = document.getElementById('opInput').value.trim().toUpperCase();
-            if(name.length < 2) return alert("Hatalı Kod Adı!");
-            await update(ref(db, `users/${name}/status`), { name, lastSession: MY_SESSION, avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${name}` });
+            if(name.length < 2) return;
+            await update(ref(db, `users/${name}/status`), { name, avatar: `https://api.dicebear.com/7.x/bottts/svg?seed=${name}` });
             localStorage.setItem('nexus_user', name); MY_NAME = name;
             document.getElementById('loginModal').style.display = 'none'; 
             initNexus();
         };
 
         document.getElementById('startBtn').onclick = () => {
-            if(!modelsLoaded) return alert("Sistem Modülleri Hazırlanıyor...");
+            if(!modelsLoaded) return;
             startAiEye();
             update(ref(db, `users/${MY_NAME}`), { timerActive: true, startTime: Date.now() });
         };
@@ -336,17 +331,14 @@
             stopAiEye();
             get(ref(db, `users/${MY_NAME}`)).then(s => {
                 const v = s.val();
-                update(ref(db, `users/${MY_NAME}`), { 
-                    timerActive: false, 
-                    pendingTime: (v.pendingTime || 0) + (Date.now() - v.startTime) 
-                });
+                update(ref(db, `users/${MY_NAME}`), { timerActive: false, pendingTime: (v.pendingTime || 0) + (Date.now() - v.startTime) });
             });
         };
 
         window.saveDay = () => {
             const d = ['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'], n = new Date().getDay();
-            document.getElementById('lDayBtn').innerText = `DÜNÜ MÜHÜRLE (${d[(n+6)%7]})`; 
-            document.getElementById('tDayBtn').innerText = `BUGÜNÜ MÜHÜRLE (${d[n]})`;
+            document.getElementById('lDayBtn').innerText = `DÜN (${d[(n+6)%7]})`; 
+            document.getElementById('tDayBtn').innerText = `BUGÜN (${d[n]})`;
             document.getElementById('saveBox').style.display = 'flex';
         };
 
@@ -365,7 +357,6 @@
             document.getElementById('profileIntel').classList.add('hidden');
             document.getElementById('quoteText').classList.remove('hidden');
             document.getElementById('medalGrid').classList.add('hidden');
-            document.getElementById('mIcon').innerText = "📜"; 
             document.getElementById('mTitle').innerText = "DOKTRİN";
             document.getElementById('quoteText').innerText = DOKTRİN[Math.floor(Math.random()*DOKTRİN.length)];
             document.getElementById('nexusModal').classList.replace('hidden', 'flex');
@@ -374,24 +365,19 @@
         window.openMedals = () => {
             const grid = document.getElementById('medalGrid'); grid.innerHTML = "";
             grid.classList.remove('hidden'); document.getElementById('profileIntel').classList.add('hidden'); document.getElementById('quoteText').classList.add('hidden');
-            document.getElementById('mTitle').innerText = "MADALYA KOLEKSİYONU"; document.getElementById('mIcon').innerText = "🎖️";
+            document.getElementById('mTitle').innerText = "KOLEKSİYON";
             MEDALS.forEach(m => {
                 const box = document.createElement('div'); box.className = "medal-box"; box.innerText = m.i;
-                box.onclick = () => { 
-                    document.getElementById('quoteText').classList.remove('hidden'); 
-                    document.getElementById('quoteText').innerText = m.d; 
-                    document.getElementById('mTitle').innerText = m.t; 
-                };
+                box.onclick = () => { document.getElementById('quoteText').classList.remove('hidden'); document.getElementById('quoteText').innerText = m.d; document.getElementById('mTitle').innerText = m.t; };
                 grid.appendChild(box);
             });
             document.getElementById('nexusModal').classList.replace('hidden', 'flex');
         };
 
         window.showUserProfile = (name, data) => {
-            document.getElementById('mIcon').innerHTML = `<img src="${data.status?.avatar}" class="w-24 h-24 mx-auto rounded-full border-4 border-blue-600 shadow-xl">`;
+            document.getElementById('mIcon').innerHTML = `<img src="${data.status?.avatar}" class="w-20 h-20 mx-auto rounded-full border-2 border-blue-600">`;
             document.getElementById('mTitle').innerText = name;
-            const totalMin = Math.floor((Object.values(data.history||{}).reduce((a,b)=>a+b,0) + (data.pendingTime||0))/60000);
-            document.getElementById('mDesc').innerText = `${data.timerActive ? 'ŞU AN ODAKLANIYOR' : 'PROTOKOL BEKLEMEDE'} | TOPLAM VERİM: ${totalMin} DK`;
+            document.getElementById('mDesc').innerText = `VERİM ANALİZİ VE GEÇMİŞ İSTATİSTİKLER`;
             document.getElementById('profileIntel').classList.remove('hidden');
             document.getElementById('quoteText').classList.add('hidden');
             document.getElementById('medalGrid').classList.add('hidden');
@@ -399,7 +385,7 @@
             setTimeout(() => drawChart('profileChart', data.history || {}, false), 200);
         };
 
-        // 🛠️ ADMIN MASTER FUNCTIONS
+        // ADMIN FUNCTIONS
         window.addEventListener('keydown', (e) => { if (e.key.toLowerCase() === 'l') document.getElementById('admBox').style.display = 'flex'; });
         window.checkAdm = () => {
             if(document.getElementById('admPass').value === "1905") {
@@ -410,25 +396,13 @@
                 });
             }
         };
-        window.mEdit = () => {
-            const user = document.getElementById('aUsr').value, day = document.getElementById('aDay').value, mins = parseInt(document.getElementById('aMin').value) || 0;
-            get(ref(db, `users/${user}`)).then(s => {
-                const v = s.val() || {}, h = v.history || {};
-                h[day] = (h[day] || 0) + (mins * 60000);
-                update(ref(db, `users/${user}`), { history: h });
-                alert("Başarıyla Güncellendi.");
-            });
-        };
-        window.mKick = () => { if(confirm("OPERATÖR KALICI OLARAK SİLİNSİN Mİ?")) remove(ref(db, `users/${document.getElementById('aUsr').value}`)); };
 
-        // 🚀 BAŞLATICI
         function initNexus() {
             loadAiModels();
             onValue(ref(db, `users/${MY_NAME}`), (snap) => {
                 MY_DATA = snap.val() || {};
-                if(!MY_DATA.status) return; 
                 document.getElementById('userName').innerText = MY_NAME;
-                document.getElementById('pAvatar').innerHTML = `<img src="${MY_DATA.status.avatar}" class="w-full h-full">`;
+                document.getElementById('pAvatar').innerHTML = `<img src="${MY_DATA.status?.avatar}">`;
                 if(timerInterval) clearInterval(timerInterval);
                 if(MY_DATA.timerActive) {
                     document.getElementById('startBtn').classList.add('hidden'); document.getElementById('stopBtn').classList.remove('hidden');
@@ -441,34 +415,25 @@
             });
 
             onValue(ref(db, 'users'), (snap) => {
-                const users = snap.val() || {}, r = document.getElementById('radar'), l = document.getElementById('leaderboard');
+                const r = document.getElementById('radar'), l = document.getElementById('leaderboard');
                 r.innerHTML = ""; l.innerHTML = "";
                 const today = ['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'][new Date().getDay()];
-                const list = Object.entries(users).map(([name, u]) => {
+                const list = Object.entries(snap.val() || {}).map(([name, u]) => {
                     const totalToday = (u.history?.[today] || 0) + (u.pendingTime || 0) + (u.timerActive ? (Date.now() - u.startTime) : 0);
                     return { name, totalToday, u };
                 }).sort((a, b) => b.totalToday - a.totalToday);
 
                 list.forEach((u, i) => {
                     const div = document.createElement('div');
-                    div.className = `p-4 glass flex justify-between items-center mb-2 border-l-4 ${u.u.timerActive?'border-green-500':'border-transparent'} hover:border-blue-500 transition-all`;
-                    div.innerHTML = `<div class="flex items-center gap-3 text-[12px] font-black uppercase"><img src="${u.u.status?.avatar}" class="w-8 h-8 rounded-full border border-slate-700"> ${u.name}</div><span class="text-[11px] text-blue-400 font-mono tracking-tighter">${Math.floor(u.totalToday/60000)} DK</span>`;
+                    div.className = "p-4 glass flex justify-between items-center mb-2 border-l-4 " + (u.u.timerActive ? 'border-green-500' : 'border-transparent');
+                    div.innerHTML = `<span class="text-xs font-black">${u.name}</span><span class="text-xs text-blue-400 font-mono">${Math.floor(u.totalToday/60000)} DK</span>`;
                     div.onclick = () => showUserProfile(u.name, u.u);
                     r.appendChild(div);
-
-                    const lRow = document.createElement('div');
-                    lRow.className = `leader-row ${i<3?'rank-'+(i+1):'text-slate-400 opacity-60'}`;
-                    lRow.innerHTML = `<span>${i+1}. ${u.name}</span><span>${Math.floor(u.totalToday/60000)}dk</span>`;
-                    l.appendChild(lRow);
                 });
             });
         }
 
-        if(MY_NAME) {
-            get(ref(db, `users/${MY_NAME}`)).then(s => {
-                if(s.exists()) { document.getElementById('loginModal').style.display = 'none'; initNexus(); }
-            });
-        }
+        if(MY_NAME) { get(ref(db, `users/${MY_NAME}`)).then(s => { if(s.exists()) { document.getElementById('loginModal').style.display = 'none'; initNexus(); } }); }
     </script>
 </body>
 </html>
